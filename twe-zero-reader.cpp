@@ -63,9 +63,7 @@ int main(int argc, char **argv)
             if (count > 0) {
                 buf[count] = 0;
                 if (buf[0] == ':') {
-                    if (count != 50) {
-                        cout << "[ malformed: " << buf << "]" << endl;;
-                    }
+                    
                     unsigned char bits[24];
                     auto decodeHex = [](char c) {
                         if (c >= '0' && c <= '9') {
@@ -77,7 +75,11 @@ int main(int argc, char **argv)
                         }
                     };
                     for (int i = 0; i < 24; ++i) {
-                        bits[i] = decodeHex(buf[i * 2 + 1]) * 16 + decodeHex(buf[i * 2 + 2]);
+                        if (i * 2 + 2 < count) {
+                            bits[i] = decodeHex(buf[i * 2 + 1]) * 16 + decodeHex(buf[i * 2 + 2]);
+                        } else {
+                            bits[i] = 0;
+                        }
                     }
 
                     int logicalId = bits[0];
@@ -142,7 +144,7 @@ int main(int argc, char **argv)
 
 
                     } else {
-                        cout << "[ unknown msg " << type << "]" << endl;
+                        cout << "??: " << (buf + 1);
                     }
 
                     cout << "-------------------------------------------------" << endl;
@@ -150,7 +152,7 @@ int main(int argc, char **argv)
                 } else if (buf[0] == '!') {
                     if (buf[count - 1] == '\n' || buf[count - 1] == '\r')
                         buf[count - 1] = 0;
-                    cout << "! " << buf << endl;;
+                    cout << "MSG: " << (buf + 1) << endl;;
                 } else if (count > 1) {
                     cout << "[ malformed: " << buf << "]" << endl;;
                 }
